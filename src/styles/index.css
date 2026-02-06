@@ -1,0 +1,370 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #1a1a1a;
+  color: white;
+  overflow: hidden;
+}
+
+.app {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  height: 60px;
+  background: #0f0f0f;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  border-bottom: 1px solid #333;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.nav {
+  display: flex;
+  gap: 30px;
+}
+
+.nav a {
+  padding: 8px;
+  color: #aaa;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.nav a:hover {
+  color: white;
+}
+
+.nav-cad {
+  background: #4a5eff ;
+  padding: 8px 20px !important;
+  border-radius: 6px;
+  color: white !important;
+}
+
+.sign-in {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Toolbar */
+.toolbar {
+  width: 60px;
+  background: #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 15px 0;
+  align-items: center;
+  margin-left: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.toolbar-top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.toolbar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.toolbar-btn {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 2px solid transparent;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.toolbar-icon-img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.toolbar-text {
+  font-size: 24px;
+  font-weight: 300;
+}
+
+.toolbar-btn:hover:not(.disabled) {
+  background: #3a3a3a;
+  border-color: #4a5eff;
+}
+
+.toolbar-btn.active {
+  background: #4a5eff;
+  border-color: #4a5eff;
+}
+
+.toolbar-btn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.toolbar-divider {
+  width: 30px;
+  height: 1px;
+  background: #444;
+  margin: 8px 0;
+}
+
+/* CAD Viewer */
+.cad-viewer {
+  flex: 1;
+  position: relative;
+  background: #1a1a1a;
+}
+
+/* 저장 버튼 - 우측 상단 */
+.save-buttons {
+  position: absolute;
+  top: 20px;
+  right:10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  z-index: 10;
+}
+
+.save-btn {
+  background: #4a5966;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.save-btn:hover {
+  background: #5a6976;
+}
+
+.help-btn {
+  width: 20px;
+  height: 20px;
+  transform: translate(0, -10px);
+  background: none;
+  color: #bebebe;
+  border-color: #d1d1d1;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.help-btn:hover {
+  background: #000000;
+}
+
+/* 좌표 표시 - 왼쪽 구석 */
+.object-info-left {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 12px;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+.object-info-left div {
+  margin-bottom: 5px;
+}
+
+.object-info {
+  position: absolute;
+  top: 20px;
+  right: 320px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 12px;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+.object-info div {
+  margin-bottom: 5px;
+}
+
+/* Asset Panel */
+.asset-panel {
+  width: 300px;
+  background: #3a3a3a;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.asset-header {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #4a4a4a;
+}
+
+.collapse-icon {
+  font-size: 20px;
+  color: #aaa;
+}
+
+.back-icon {
+  font-size: 20px;
+  color: #4a5eff;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.back-icon:hover {
+  color: #6a7eff;
+}
+
+.asset-header h3 {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.asset-grid {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.asset-item {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.asset-item:hover .asset-preview {
+  border-color: #4a5eff;
+}
+
+.asset-item.selected .asset-preview {
+  background: #6e7a8f;
+  border-color: white;
+}
+
+.asset-preview {
+  aspect-ratio: 1;
+  background: #545966;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.glb-preview {
+  font-size: 14px;
+  color: #aaa;
+  font-weight: 500;
+}
+
+.folder-preview {
+  background: #4a5eff !important;
+}
+
+.folder-icon {
+  font-size: 48px;
+}
+
+.folder-item:hover .folder-preview {
+  background: #6a7eff !important;
+  border-color: #4a5eff !important;
+}
+
+.asset-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.asset-name {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 13px;
+  color: #ccc;
+}
+
+/* Image Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+.modal-content {
+  max-width: 90%;
+  max-height: 90%;
+  cursor: default;
+}
+
+.modal-content img {
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
