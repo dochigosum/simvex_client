@@ -1,0 +1,90 @@
+.object-select-page {
+  min-height: 100vh;
+  background: #1B1C20;
+  padding-top: 51px; /* 64 * 0.8 */
+}
+
+.object-select-container {
+  max-width: 896px; /* 1120 * 0.8 */
+  margin: 0 auto;
+  padding: 51px 26px; /* 64 * 0.8, 32 * 0.8 */
+}
+
+.object-select-title {
+  font-size: 26px; /* 32 * 0.8 */
+  font-weight: 600;
+  color: white;
+  text-align: center;
+  margin-bottom: 38px; /* 48 * 0.8 */
+}
+
+.object-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(179px, 1fr)); /* 224 * 0.8 */
+  gap: 15px; /* 19 * 0.8 */
+}
+
+.object-card-wrapper {
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.object-card {
+  background: #2d3748;
+  border-radius: 10px; /* 13 * 0.8 */
+  overflow: hidden;
+  aspect-ratio: 1;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.object-card-wrapper:hover .object-card {
+  transform: translateY(-5px); /* 6 * 0.8 */
+  box-shadow: 0 10px 26px rgba(107, 127, 255, 0.3); /* 12 * 0.8, 32 * 0.8 */
+}
+
+.object-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.object-name {
+  color: #ffffff;
+  font-size: 13px; /* 16 * 0.8 */
+  font-weight: 600;
+  text-align: center;
+  margin: 8px 0 0 0; /* 10 * 0.8 */
+  line-height: 1.4;
+}
+
+/* 오브젝트 추가 카드 */
+.add-object-card {
+  background: #1f2937;
+  border: 2px dashed #4b5563;
+}
+
+.object-card-wrapper:hover .add-object-card {
+  background: #374151;
+  border-color: #6B7FFF;
+}
+
+.add-object-icon {
+  font-size: 64px; /* 80 * 0.8 */
+  color: #6B7FFF;
+  font-weight: 300;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .object-select-title {
+    font-size: 19px; /* 24 * 0.8 */
+  }
+
+  .object-grid {
+    grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); /* 160 * 0.8 */
+    gap: 10px; /* 13 * 0.8 */
+  }
+}
