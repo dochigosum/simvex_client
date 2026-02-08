@@ -1,11 +1,11 @@
 import { Routes, Route } from "react-router-dom";
-// import PostList from "./pages/PostList"; 예시
-
+import CAD from "./pages/cad/App";
 
 function App() {
   return (
     <Routes>
-      {/* <Route path="/lost" element={<LostList />} /> 예시 */}
+      <Route path="/" element={<CAD />} />
+      <Route path="/cad" element={<CAD />} />
     </Routes>
   );
 }
