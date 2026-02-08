@@ -4,7 +4,7 @@ import { OrbitControls, Grid } from '@react-three/drei';
 import SceneObject from './SceneObject';
 import * as THREE from 'three';
 
-function CADViewer({ objects, selectedObjectId, currentTool, onSelectObject, onUpdateObject, onSave0, onSave100 }) {
+function CADViewer({ objects, selectedObjectId, currentTool, onSelectObject, onUpdateObject }) {
   const selectedObject = objects.find(obj => obj.id === selectedObjectId);
 
   // 배경 클릭 핸들러 - 오브젝트만 해제, 툴은 유지
@@ -13,30 +13,47 @@ function CADViewer({ objects, selectedObjectId, currentTool, onSelectObject, onU
     onSelectObject(null);
   };
 
+  // JSON 내보내기 핸들러
+  const handleExportJSON = () => {
+    // fileName만 추출
+    const exportData = objects.map(obj => ({
+      fileName: obj.assetPath.split('/').pop() // 경로에서 파일명만 추출
+    }));
+
+    const sceneData = {
+      objects: exportData,
+      totalObjects: objects.length
+    };
+
+    // JSON 파일로 다운로드
+    const dataStr = JSON.stringify(sceneData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `scene_${new Date().getTime()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="cad-viewer">
-      {/* 저장 버튼 */}
-      <div className="save-buttons">
-        <button className="save-btn" onClick={onSave0}>
-          0% 상태 저장
-        </button>
-        <button className="save-btn" onClick={onSave100}>
-          100% 상태 저장
-        </button>
-        <button className="help-btn" title="도움말" onClick={() => { /* TODO: 도움말 모달 열기 */ }}>
-          ?
+      {/* 좌표/회전 표시 및 내보내기 - 왼쪽 (항상 표시) */}
+      <div className="object-info-left">
+        {selectedObject ? (
+          <>
+            <div>위치: X: {selectedObject.position[0].toFixed(2)}, Y: {selectedObject.position[1].toFixed(2)}, Z: {selectedObject.position[2].toFixed(2)}</div>
+            <div>회전: X: {(selectedObject.rotation[0] * 180 / Math.PI).toFixed(1)}°, Y: {(selectedObject.rotation[1] * 180 / Math.PI).toFixed(1)}°, Z: {(selectedObject.rotation[2] * 180 / Math.PI).toFixed(1)}°</div>
+          </>
+        ) : (
+          <div style={{ color: '#888' }}>오브젝트를 선택하세요</div>
+        )}
+        <button className="export-btn" onClick={handleExportJSON} title="전체 씬 JSON 내보내기">
+          내보내기 ({objects.length}개)
         </button>
       </div>
 
-      {/* 좌표/회전 표시 - 왼쪽 */}
-      {selectedObject && (
-        <div className="object-info-left">
-          <div>위치: X: {selectedObject.position[0].toFixed(2)}, Y: {selectedObject.position[1].toFixed(2)}, Z: {selectedObject.position[2].toFixed(2)}</div>
-          <div>회전: X: {(selectedObject.rotation[0] * 180 / Math.PI).toFixed(1)}°, Y: {(selectedObject.rotation[1] * 180 / Math.PI).toFixed(1)}°, Z: {(selectedObject.rotation[2] * 180 / Math.PI).toFixed(1)}°</div>
-        </div>
-      )}
-
-      <Canvas camera={{ position: [5, 5, 5], fov: 60 }}>
+      <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
         {/* 조명 */}
         <ambientLight intensity={1} />
         <directionalLight position={[10, 10, 5]} intensity={1} />

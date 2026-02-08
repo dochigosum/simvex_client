@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Navigation from '../../components/Layout/Navigation';
 import Header from './components/Header';
 import Toolbar from './components/Toolbar';
 import AssetPanel from './components/AssetPanel';
@@ -160,20 +161,69 @@ function App() {
   };
 
   // 저장 핸들러
-  const handleSave0 = () => {
-    console.log('0% 상태 저장:', sceneObjects);
-    // TODO: 서버에 저장 또는 로컬스토리지에 저장
-    alert('0% 상태가 저장되었습니다.');
+  const handleSave0 = async () => {
+    const sceneData = {
+      progress: 0,
+      objects: sceneObjects,
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('0% 상태 저장:', sceneData);
+    
+    try {
+      // 서버로 JSON 전송
+      const response = await fetch('YOUR_API_ENDPOINT/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sceneData)
+      });
+      
+      if (response.ok) {
+        alert('0% 상태가 저장되었습니다.');
+      } else {
+        alert('저장 실패');
+      }
+    } catch (error) {
+      console.error('저장 오류:', error);
+      alert('저장 중 오류 발생');
+    }
   };
 
-  const handleSave100 = () => {
-    console.log('100% 상태 저장:', sceneObjects);
-    // TODO: 서버에 저장 또는 로컬스토리지에 저장
-    alert('100% 상태가 저장되었습니다.');
+  const handleSave100 = async () => {
+    const sceneData = {
+      progress: 100,
+      objects: sceneObjects,
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('100% 상태 저장:', sceneData);
+    
+    try {
+      // 서버로 JSON 전송
+      const response = await fetch('YOUR_API_ENDPOINT/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(sceneData)
+      });
+      
+      if (response.ok) {
+        alert('100% 상태가 저장되었습니다.');
+      } else {
+        alert('저장 실패');
+      }
+    } catch (error) {
+      console.error('저장 오류:', error);
+      alert('저장 중 오류 발생');
+    }
   };
 
   return (
     <div className="app">
+      <Navigation />
       <Header />
       
       <div className="main-content">

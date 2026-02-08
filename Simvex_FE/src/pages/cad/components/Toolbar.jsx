@@ -2,17 +2,17 @@ import React from 'react';
 
 function Toolbar({ currentTool, onToolClick, canUndo, canRedo }) {
   const topTools = [
-    { id: 'move', icon: '/toolbar_icon/확대.png', label: '이동' },
-    { id: 'rotate', icon: '/toolbar_icon/회전.png', label: '회전' },
-    { id: 'copy', icon: '/toolbar_icon/복사.png', label: '복사' },
-    { id: 'paste', icon: '/toolbar_icon/붙여넣기.png', label: '붙여넣기' },
+    { id: 'move', icon: '/icons/확대.png', label: '이동' },
+    { id: 'rotate', icon: '/icons/회전.png', label: '회전' },
+    { id: 'copy', icon: '/icons/복사.png', label: '복사' },
+    { id: 'paste', icon: '/icons/붙여넣기.png', label: '붙여넣기' },
   ];
 
   const bottomTools = [
-    { id: 'light', icon: '/toolbar_icon/조명.png', label: '조명' },
-    { id: 'undo', icon: '/toolbar_icon/뒤로가기.png', label: '뒤로가기', disabled: !canUndo },
-    { id: 'redo', icon: '/toolbar_icon/되돌리기.png', label: '되돌리기', disabled: !canRedo },
-    { id: 'delete', icon: '/toolbar_icon/삭제.png', label: '삭제' },
+    { id: 'light', icon: '/icons/조명.png', label: '조명' },
+    { id: 'undo', icon: '/icons/뒤로가기.png', label: '뒤로가기', disabled: !canUndo },
+    { id: 'redo', icon: '/icons/되돌리기.png', label: '되돌리기', disabled: !canRedo },
+    { id: 'delete', icon: '/icons/삭제.png', label: '삭제' },
   ];
 
   const renderButton = (tool) => (

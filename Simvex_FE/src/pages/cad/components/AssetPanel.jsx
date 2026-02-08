@@ -107,9 +107,6 @@ function AssetPanel({ selectedAssets, onAssetClick }) {
         {currentFolder && (
           <span className="back-icon" onClick={handleBackClick}>⬅</span>
         )}
-        {!currentFolder && (
-          <span className="collapse-icon">≫</span>
-        )}
         <h3>{currentFolder || '3D Assets'}</h3>
       </div>
       
