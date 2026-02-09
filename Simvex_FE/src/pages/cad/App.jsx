@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Navigation from '../../components/Layout/Navigation';
 import Header from './components/Header';
 import Toolbar from './components/Toolbar';
@@ -15,23 +15,128 @@ function App() {
   const [selectedAssets, setSelectedAssets] = useState([]); // 선택된 GLB 파일들
   const [imageModalSrc, setImageModalSrc] = useState(null);
   const [copiedObject, setCopiedObject] = useState(null); // 복사된 오브젝트
+  const screenshotRef = useRef();
   
   const { setState: setUndoState, undo, redo, canUndo, canRedo } = useUndoRedo(sceneObjects);
 
+  // sceneObjects 변경 감지
+  useEffect(() => {
+    console.log('📦 sceneObjects 변경됨:', sceneObjects.length, 'objects');
+    console.log('📦 상세:', sceneObjects);
+  }, [sceneObjects]);
+
+  // 컴포넌트 마운트 시 프로젝트 불러오기
+  useEffect(() => {
+    console.log('🎨 CAD 페이지 로드');
+    const currentProjectId = localStorage.getItem('current_project_id');
+    console.log('📌 current_project_id:', currentProjectId);
+    
+    if (currentProjectId) {
+      const PROJECTS_KEY = 'simvex_projects';
+      const savedProjects = localStorage.getItem(PROJECTS_KEY);
+      console.log('📂 savedProjects:', savedProjects);
+      
+      const projects = savedProjects ? JSON.parse(savedProjects) : [];
+      console.log('📁 파싱된 프로젝트:', projects);
+      
+      const project = projects.find(p => p.id === Number(currentProjectId));
+      console.log('🔍 찾은 프로젝트:', project);
+      
+      if (project && project.objects) {
+        console.log('✅ 오브젝트 복원:', project.objects);
+        setSceneObjects(project.objects);
+        // AssetPanel 선택 상태 복원
+        const assetPaths = project.objects.map(obj => obj.assetPath);
+        setSelectedAssets(assetPaths);
+      } else {
+        console.log('⚠️ 프로젝트 또는 오브젝트 없음');
+      }
+    } else {
+      console.log('⚠️ current_project_id 없음');
+    }
+  }, []);
+
+  // 프로젝트 저장 핸들러
+  const handleSaveProject = () => {
+    console.log('💾 저장 시작!');
+    
+    if (!screenshotRef.current) {
+      alert('스크린샷을 캡처할 수 없습니다!');
+      console.error('❌ screenshotRef.current가 없음');
+      return;
+    }
+
+    // 현재 프로젝트 ID 가져오기
+    const currentProjectId = localStorage.getItem('current_project_id');
+    console.log('📌 현재 프로젝트 ID:', currentProjectId);
+    
+    // 스크린샷 캡처
+    const thumbnail = screenshotRef.current.captureScreenshot();
+    console.log('📸 스크린샷 캡처됨:', thumbnail?.substring(0, 50) + '...');
+    
+    // 프로젝트 목록 불러오기
+    const PROJECTS_KEY = 'simvex_projects';
+    const savedProjects = localStorage.getItem(PROJECTS_KEY);
+    const projects = savedProjects ? JSON.parse(savedProjects) : [];
+    console.log('📂 기존 프로젝트 목록:', projects);
+    
+    // 현재 프로젝트 찾기 또는 새로 생성
+    const projectIndex = projects.findIndex(p => p.id === Number(currentProjectId));
+    console.log('🔍 프로젝트 인덱스:', projectIndex);
+    
+    if (projectIndex >= 0) {
+      // 기존 프로젝트 업데이트
+      console.log('✏️ 기존 프로젝트 업데이트');
+      projects[projectIndex] = {
+        ...projects[projectIndex],
+        previewImgUrl: thumbnail,
+        thumbnail: thumbnail,
+        objects: sceneObjects,
+        updatedAt: new Date().toISOString()
+      };
+    } else {
+      // 새 프로젝트 생성
+      console.log('➕ 새 프로젝트 생성');
+      const newProject = {
+        id: Date.now(),
+        name: 'New Project',
+        previewImgUrl: thumbnail,
+        thumbnail: thumbnail,
+        objects: sceneObjects,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      projects.push(newProject);
+      localStorage.setItem('current_project_id', newProject.id);
+    }
+    
+    // localStorage에 저장
+    localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
+    console.log('✅ 저장 완료!', projects);
+    
+    alert('프로젝트가 저장되었습니다! ✅');
+  };
+
   // 에셋 클릭 핸들러
   const handleAssetClick = (asset) => {
+    console.log('🎯 에셋 클릭:', asset);
+    
     if (asset.type === 'glb') {
       // GLB 토글
       const isSelected = selectedAssets.includes(asset.path);
+      console.log('🔍 이미 선택됨?', isSelected);
       
       if (isSelected) {
         // 제거
+        console.log('➖ GLB 제거:', asset.path);
         setSelectedAssets(prev => prev.filter(p => p !== asset.path));
         const newObjects = sceneObjects.filter(obj => obj.assetPath !== asset.path);
         setSceneObjects(newObjects);
         setUndoState(newObjects); // 히스토리에 저장
+        console.log('📦 sceneObjects 업데이트:', newObjects);
       } else {
         // 추가
+        console.log('➕ GLB 추가:', asset.path);
         setSelectedAssets(prev => [...prev, asset.path]);
         const newObject = {
           id: Date.now() + Math.random(),
@@ -41,11 +146,13 @@ function App() {
           scale: [1, 1, 1],
         };
         const newObjects = [...sceneObjects, newObject];
+        console.log('📦 sceneObjects 업데이트:', newObjects);
         setSceneObjects(newObjects);
         setUndoState(newObjects); // 히스토리에 저장
       }
     } else if (asset.type === 'image') {
       // PNG 모달 열기
+      console.log('🖼️ 이미지 모달 열기:', asset.path);
       setImageModalSrc(asset.path);
     }
   };
@@ -160,71 +267,10 @@ function App() {
     }
   };
 
-  // 저장 핸들러
-  const handleSave0 = async () => {
-    const sceneData = {
-      progress: 0,
-      objects: sceneObjects,
-      timestamp: new Date().toISOString()
-    };
-    
-    console.log('0% 상태 저장:', sceneData);
-    
-    try {
-      // 서버로 JSON 전송
-      const response = await fetch('YOUR_API_ENDPOINT/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(sceneData)
-      });
-      
-      if (response.ok) {
-        alert('0% 상태가 저장되었습니다.');
-      } else {
-        alert('저장 실패');
-      }
-    } catch (error) {
-      console.error('저장 오류:', error);
-      alert('저장 중 오류 발생');
-    }
-  };
-
-  const handleSave100 = async () => {
-    const sceneData = {
-      progress: 100,
-      objects: sceneObjects,
-      timestamp: new Date().toISOString()
-    };
-    
-    console.log('100% 상태 저장:', sceneData);
-    
-    try {
-      // 서버로 JSON 전송
-      const response = await fetch('YOUR_API_ENDPOINT/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(sceneData)
-      });
-      
-      if (response.ok) {
-        alert('100% 상태가 저장되었습니다.');
-      } else {
-        alert('저장 실패');
-      }
-    } catch (error) {
-      console.error('저장 오류:', error);
-      alert('저장 중 오류 발생');
-    }
-  };
-
   return (
     <div className="app">
       <Navigation />
-      <Header />
+      <Header onSave={handleSaveProject} />
       
       <div className="main-content">
         <Toolbar 
@@ -240,8 +286,7 @@ function App() {
           currentTool={currentTool}
           onSelectObject={setSelectedObjectId}
           onUpdateObject={updateObject}
-          onSave0={handleSave0}
-          onSave100={handleSave100}
+          screenshotRef={screenshotRef}
         />
         
         <AssetPanel

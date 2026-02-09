@@ -1,10 +1,26 @@
 import React from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Grid } from '@react-three/drei';
 import SceneObject from './SceneObject';
 import * as THREE from 'three';
 
-function CADViewer({ objects, selectedObjectId, currentTool, onSelectObject, onUpdateObject }) {
+// 스크린샷 캡처를 위한 컴포넌트
+function ScreenshotHelper({ onCapture }) {
+  const { gl, scene, camera } = useThree();
+  
+  React.useImperativeHandle(onCapture, () => ({
+    captureScreenshot: () => {
+      // 현재 화면을 렌더링
+      gl.render(scene, camera);
+      // Canvas를 이미지로 변환
+      return gl.domElement.toDataURL('image/png');
+    }
+  }));
+  
+  return null;
+}
+
+function CADViewer({ objects, selectedObjectId, currentTool, onSelectObject, onUpdateObject, screenshotRef }) {
   const selectedObject = objects.find(obj => obj.id === selectedObjectId);
 
   // 배경 클릭 핸들러 - 오브젝트만 해제, 툴은 유지
@@ -12,33 +28,10 @@ function CADViewer({ objects, selectedObjectId, currentTool, onSelectObject, onU
     e.stopPropagation();
     onSelectObject(null);
   };
-
-  // JSON 내보내기 핸들러
-  const handleExportJSON = () => {
-    // fileName만 추출
-    const exportData = objects.map(obj => ({
-      fileName: obj.assetPath.split('/').pop() // 경로에서 파일명만 추출
-    }));
-
-    const sceneData = {
-      objects: exportData,
-      totalObjects: objects.length
-    };
-
-    // JSON 파일로 다운로드
-    const dataStr = JSON.stringify(sceneData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `scene_${new Date().getTime()}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
+  
   return (
     <div className="cad-viewer">
-      {/* 좌표/회전 표시 및 내보내기 - 왼쪽 (항상 표시) */}
+      {/* 좌표/회전 표시 - 왼쪽 */}
       <div className="object-info-left">
         {selectedObject ? (
           <>
@@ -48,12 +41,11 @@ function CADViewer({ objects, selectedObjectId, currentTool, onSelectObject, onU
         ) : (
           <div style={{ color: '#888' }}>오브젝트를 선택하세요</div>
         )}
-        <button className="export-btn" onClick={handleExportJSON} title="전체 씬 JSON 내보내기">
-          내보내기 ({objects.length}개)
-        </button>
       </div>
 
       <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
+        <ScreenshotHelper onCapture={screenshotRef} />
+        
         {/* 조명 */}
         <ambientLight intensity={1} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
