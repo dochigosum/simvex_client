@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../../services/authApi';
 import './styles/auth.css';
 
 const Login = () => {
@@ -10,6 +11,7 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,17 +22,29 @@ const Login = () => {
     setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (formData.email && formData.password) {
-      if (formData.password.length < 8) {
-        setError('이메일 또는 비밀번호가 일치하지 않습니다');
-        return;
-      }
-      navigate('/');
-    } else {
+
+    if (!formData.email || !formData.password) {
       setError('이메일 또는 비밀번호가 일치하지 않습니다');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await login(formData.email, formData.password);
+
+      // 유저 ID 저장 (프로젝트 목록 조회 등에 사용)
+      if (response.user_id) {
+        localStorage.setItem('user_id', response.user_id);
+      }
+
+      navigate('/');
+    } catch (err) {
+      console.error('로그인 실패:', err);
+      setError('이메일 또는 비밀번호가 일치하지 않습니다');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,8 +97,8 @@ const Login = () => {
             {error && <p className="error-message">{error}</p>}
           </div>
 
-          <button type="submit" className="auth-submit-btn">
-            로그인
+          <button type="submit" className="auth-submit-btn" disabled={loading}>
+            {loading ? '로그인 중...' : '로그인'}
           </button>
         </form>
 

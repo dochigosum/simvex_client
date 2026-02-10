@@ -103,7 +103,12 @@ const ObjectSelect = () => {
   };
 
   const handleObjectClick = (object) => {
+<<<<<<< HEAD
     navigate('/study/BP', { state: { selectedObject: object } });
+=======
+    // 친구가 만든 Study 페이지로 이동
+    navigate('/study', { state: { selectedObject: object } });
+>>>>>>> origin/develop
   };
 
   const handleAddObject = () => {
@@ -165,20 +170,20 @@ const ObjectSelect = () => {
                     alt={object.name}
                     className="object-thumbnail"
                   />
+                  <h3 className="object-name">{object.name}</h3>
                 </div>
-                <h3 className="object-name">{object.name}</h3>
               </div>
             ))}
             
             {/* 오브젝트 추가 카드 */}
             <div 
-              className="object-card-wrapper add-object-wrapper"
+              className="object-card-wrapper add-card"
               onClick={handleAddObject}
             >
               <div className="object-card">
-                <div className="add-object-icon">+</div>
+                <div className="add-icon">+</div>
+                <div className="add-text">오브젝트 추가</div>
               </div>
-              <h3 className="object-name">오브젝트 추가</h3>
             </div>
           </div>
         )}
