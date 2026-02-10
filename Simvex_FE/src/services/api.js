@@ -67,7 +67,15 @@ const apiCall = async (endpoint, options = {}) => {
       throw error;
     }
 
-    return await response.json();
+    // ✨ 수정: 빈 응답 처리 (백엔드가 응답 바디 안 보낼 때)
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const text = await response.text();
+      return text ? JSON.parse(text) : null;
+    }
+    
+    // JSON이 아닌 응답이거나 빈 응답
+    return null;
   } catch (error) {
     console.error('API Call Error:', error);
     throw error;
