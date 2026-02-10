@@ -1,0 +1,81 @@
+.navigation {
+  width: 100%;
+  background: #121417;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.nav-container {
+  width: 100%;
+  height: 68px; /* 85 * 0.8 */
+  padding: 13px 80px; /* 16 * 0.8, 100 * 0.8 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: 23px; /* 28.8 * 0.8 */
+  font-weight: 700;
+  color: white;
+  text-decoration: none;
+  letter-spacing: 0.6px; /* 0.8 * 0.8 */
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px; /* 25.6 * 0.8 */
+}
+
+.nav-link {
+  width: 61px; /* 76 * 0.8 */
+  height: 32px; /* 40 * 0.8 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px; /* 9.6 * 0.8 */
+  color: white;
+  text-decoration: none;
+  font-size: 15px; /* 19.2 * 0.8 */
+  font-weight: 400;
+  transition: all 0.2s;
+  background: transparent;
+}
+
+.nav-link:hover {
+  background: #2a2d33;
+}
+
+.nav-link.active {
+  background: #4649F1;
+  color: white;
+}
+
+.sign-in-btn {
+  width: 84px; /* 105.6 * 0.8 */
+  height: 32px; /* 40 * 0.8 */
+  padding: 10px; /* 12 * 0.8 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px; /* 6 * 0.8 */
+  color: white;
+  background: #1b1c20;
+  text-decoration: none;
+  font-size: 11px; /* 14 * 0.8 */
+  font-weight: 400;
+  border-radius: 40px; /* 50 * 0.8 */
+  transition: all 0.2s;
+}
+
+.sign-in-btn:hover {
+  opacity: 0.8;
+}
+
+/* 로그인 아이콘 */
+.sign-in-icon {
+  width: 13px; /* 16 * 0.8 */
+  height: 13px; /* 16 * 0.8 */
+}

@@ -1,0 +1,118 @@
+.object-select-page {
+  min-height: 100vh;
+  background: #1B1C20;
+  padding-top: 68px; /* Navigation 높이 (85 * 0.8) */
+}
+
+.object-select-container {
+  max-width: 1088px; /* 1360 * 0.8 */
+  margin: 0 auto;
+  padding: 64px 38px; /* 80 * 0.8, 48 * 0.8 */
+}
+
+.object-select-title {
+  font-size: 26px; /* 32 * 0.8 */
+  font-weight: 600;
+  color: white;
+  text-align: center;
+  margin-bottom: 38px; /* 48 * 0.8 */
+}
+
+.object-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 19px; /* 24 * 0.8 */
+}
+
+.object-card-wrapper {
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.object-card {
+  background: #2a2e35;
+  border-radius: 10px; /* 12 * 0.8 */
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.object-card-wrapper:hover .object-card {
+  transform: translateY(-3px); /* 4 * 0.8 */
+  box-shadow: 0 6px 19px rgba(107, 127, 255, 0.4); /* 8 * 0.8, 24 * 0.8 */
+}
+
+.object-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.object-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  padding: 13px; /* 16 * 0.8 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.object-name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  color: #ffffff;
+  font-size: 13px; /* 16 * 0.8 */
+  font-weight: 600;
+  text-align: center;
+  padding: 13px; /* 16 * 0.8 */
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* 오브젝트 추가 카드 */
+.add-card .object-card {
+  background: #1f2937;
+  border: 2px dashed #4b5563;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* 12 * 0.8 */
+}
+
+.add-card:hover .object-card {
+  background: #374151;
+  border-color: #6B7FFF;
+}
+
+.add-icon {
+  font-size: 51px; /* 64 * 0.8 */
+  color: #6B7FFF;
+  font-weight: 300;
+  user-select: none;
+}
+
+.add-text {
+  color: #9ca3af;
+  font-size: 11px; /* 14 * 0.8 */
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .object-select-title {
+    font-size: 19px; /* 24 * 0.8 */
+  }
+
+  .object-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 13px; /* 16 * 0.8 */
+  }
+}
