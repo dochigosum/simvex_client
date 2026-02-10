@@ -18,7 +18,7 @@ import X from "../assets/X.svg";
 import tr from "../assets/tr.svg";
 import plus from "../assets/Plus.png";
 import minus from "../assets/Minus.svg";
-import star from "../assets/Star.svg";
+import star from "../assets/star.svg";
 import glass from "../assets/glass.svg";
 import oplus from "../assets/oplus.svg";
 
@@ -151,16 +151,7 @@ const Studypage = () => {
   const [parts, setParts] = useState(mockParts);
   const [chatInput, setChatInput] = useState("");
   const [aiResponse, setAiResponse] = useState("데이터를 불러오는 중...");
-// 메모 불러오기 (초기값)
-const [notes, setNotes] = useState(() => {
-  const saved = localStorage.getItem("my_notes");
-  return saved ? JSON.parse(saved) : [];
-});
-
-// 메모가 바뀔 때마다 저장하기
-useEffect(() => {
-  localStorage.setItem("my_notes", JSON.stringify(notes));
-}, [notes]);
+  const [notes, setNotes] = useState([]);
   
 
   const {
@@ -252,18 +243,21 @@ useEffect(() => {
   // ====================================
   // 💬 AI 질문 전송
   // ====================================
-const handleSendQuestion = () => {
-  if (!chatInput.trim()) return;
+  const handleSendQuestion = async () => {
+    if (!chatInput.trim()) return;
+    
+    const prevChat = chatInput;
+    setChatInput("");
+    setAiResponse("분석 중...");
 
-  const input = chatInput.toLowerCase();
-  let response = "그 부분에 대해서는 조립도를 참고해 주세요.";
-
-  if (input.includes("조립")) response = "바이스 조립은 베이스부터 시작해서 스핀들 순으로 진행합니다.";
-  if (input.includes("부품")) response = "현재 총 8개의 부품으로 구성되어 있습니다.";
-
-  setAiResponse(response);
-  setChatInput("");
-};
+    try {
+      const aiAnswer = await sendAiQuestion(1, 1, "기계 바이스", prevChat);
+      setAiResponse(aiAnswer);
+    } catch (error) {
+      console.error("AI 응답 에러:", error);
+      setAiResponse("답변을 가져오는 중 오류가 발생했습니다.");
+    }
+  };
 
   // ====================================
   // 📝 Note 추가 (서버에 저장)

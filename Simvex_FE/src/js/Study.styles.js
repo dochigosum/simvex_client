@@ -119,6 +119,11 @@ export const Set_btn = styled.span`
   background-color: ${({ $isActive }) => ($isActive ? "#4649F1" : "#9a9da9")};
   border-radius: 0 0 12px 12px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: ${({ $isActive }) => ($isActive ? "#3538d1" : "#7a7d89")};
+  }
 `;
 
 // AI 영역
@@ -140,8 +145,9 @@ export const St_Aichat = styled.div`
   margin-bottom: 30px;
 `;
 
-export const Ai_title = styled.span`
+export const Ai_title = styled.div`
   min-width: 403px;
+  width: 100%;
   color: #fff;
   height: 60px;
   display: flex;
@@ -156,8 +162,59 @@ export const Ai_text = styled.div`
   width: 495px;
   height: 628px;
   color: #fff;
-  overflow-y: scroll;
+  overflow-y: auto;
   padding: 10px;
+  
+  /* 스크롤바 스타일 */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #9a9da9;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #7a7d89;
+  }
+`;
+
+export const ChatMessage = styled.div`
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background-color: ${({ $isUser }) => ($isUser ? "#4649F1" : "#2a2d33")};
+  border-radius: 12px;
+  animation: fadeIn 0.3s ease-in;
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+export const ChatRole = styled.div`
+  font-weight: 600;
+  font-size: 11px;
+  color: ${({ theme }) => theme === "user" ? "#b8baff" : "#9a9da9"};
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+export const ChatContent = styled.div`
+  font-size: 14px;
+  line-height: 1.6;
+  color: #fff;
+  white-space: pre-wrap;
+  word-break: break-word;
 `;
 
 export const St_user = styled.div`
@@ -169,19 +226,33 @@ export const St_user = styled.div`
   padding: 14px 24px;
   border-radius: 50px;
   box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
+  background-color: #42464d;
+  gap: 12px;
 `;
 
 export const User_chat = styled.input`
-  width: 380px;
+  flex: 1;
   height: 32px;
   display: flex;
   align-items: center;
   color: #fff;
-  background-color: #42464d;
+  background-color: transparent;
   border: none;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 400;
-  margin: 0 24px;
+  
+  &::placeholder {
+    color: #9a9da9;
+  }
+  
+  &:focus {
+    outline: none;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 // 노트 영역
@@ -195,6 +266,18 @@ export const St_notebox = styled.div`
   left: 70px;
   display: flex;
   gap: 32px;
+  
+  /* 스크롤바 스타일 */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #9a9da9;
+    border-radius: 10px;
+  }
 `;
 
 export const St_note = styled.div`
@@ -203,14 +286,25 @@ export const St_note = styled.div`
   background-color: #bcbeff;
   padding: 10px 17px;
   border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
 `;
 
 export const Note_title = styled.span`
   width: 100%;
   height: 21px;
   color: #000;
-  font-weight: 400;
+  font-weight: 600;
   font-size: 16px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const Note_text = styled.div`
@@ -220,25 +314,36 @@ export const Note_text = styled.div`
   justify-content: baseline;
   overflow: hidden;
   color: #000;
-  opacity: 20%;
+  opacity: 0.6;
+  font-size: 13px;
+  line-height: 1.4;
+  word-break: break-word;
 `;
 
 export const Note_line = styled.div`
   width: 166px;
   height: 0.5px;
   background-color: #000;
-  opacity: 20%;
+  opacity: 0.3;
   margin: 8px 0;
 `;
 
 export const St_notemaker = styled.div`
   width: 200px;
   height: 200px;
-  border: 1px dashed #fff;
+  border: 2px dashed #9a9da9;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: #4649F1;
+    transform: scale(1.02);
+  }
 `;
 
 // 정보 영역
@@ -263,9 +368,15 @@ export const Com_title = styled.span`
 export const Com_imagebox = styled.div`
   width: 441px;
   height: 240px;
-  border: 1px solid #fff;
+  border: 1px solid #9a9da9;
   margin-bottom: 32px;
   margin-top: 77.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9a9da9;
+  font-size: 14px;
+  border-radius: 8px;
 `;
 
 export const Com_explainbox = styled.div`
@@ -276,7 +387,7 @@ export const Com_explainbox = styled.div`
   margin-top: 32px;
   padding-right: 10px;
 
-  /* 스크롤바 디자인 및 삼각형 제거 */
+  /* 스크롤바 디자인 */
   &::-webkit-scrollbar {
     width: 4px;
   }
@@ -298,10 +409,10 @@ export const Com_explain = styled.p`
   color: #fff;
   font-weight: 400;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.8;
   margin: 0;
   white-space: pre-wrap;
-  word-break: break-all;
+  word-break: break-word;
 `;
 
 // 프로그레스 바 영역
@@ -383,13 +494,22 @@ export const Plus_btn = styled.button`
   width: 40px;
   height: 40px;
   background: #121417;
-  border: none;
+  border: 1px solid #42464d;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  
   &:hover {
     background: #2a2d33;
+    border-color: #4649F1;
+  }
+  
+  img {
+    width: 20px;
+    height: 20px;
   }
 `;
 
@@ -398,48 +518,64 @@ export const Minus_btn = styled(Plus_btn)``;
 // 모달 영역
 export const Note_modalbody = styled.div`
   width: 100vw;
-  height: 120vh;
-  background-color: rgba(27, 28, 32, 0.25);
+  height: 100vh;
+  background-color: rgba(27, 28, 32, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 3;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
 `;
 
 export const Modal_main = styled.div`
   width: 700px;
-  height: 700px;
-  padding: 21px;
+  height: 500px;
+  padding: 24px;
   background-color: #bcbeff;
-  border-radius: 12px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: modalFadeIn 0.3s ease-out;
+  
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
 `;
 
 export const Modal_title = styled.div`
-  width: 658px;
-  height: 24px;
+  width: 100%;
+  height: 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: black;
-  font-weight: 400;
-  font-size: 16px;
+  color: #000;
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 12px;
 `;
 
 export const Modal_line = styled.div`
-  width: 658px;
-  height: 0px;
-  border: 1px solid #9193db;
-  margin-bottom: 8px;
-  margin-top: 5px;
+  width: 100%;
+  height: 1px;
+  background-color: #9193db;
+  margin-bottom: 16px;
 `;
 
 export const Modal_text = styled.div`
   display: flex;
   justify-content: baseline;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 60px);
   box-sizing: border-box;
   overflow-x: auto;
   overflow-y: scroll;
-  opacity: 20%;
 `;
