@@ -1,9 +1,9 @@
-import { Suspense, useState } from "react"; // useState 추가
+import { Suspense, useState, useEffect } from "react";
 import { useStudyLogic } from "../js/useStudy.js";
 import * as S from "../js/Study.styles.js";
 import { Canvas } from "@react-three/fiber";
 import { useNavigate } from "react-router-dom";
-import { askAi } from "../apis/studyApi.js"; 
+import { askAi, getChatHistory } from "../apis/studyApi.js"; 
 
 import {
   useGLTF,
@@ -39,23 +39,56 @@ const Studypage = () => {
 
   const navigate = useNavigate();
 
+  // AI 채팅 관련 상태
   const [chatInput, setChatInput] = useState("");
-  const [aiResponse, setAiResponse] = useState("무엇을 도와드릴까요? 제트 엔진에 대해 궁금한 점을 물어보세요."); // AI의 답변
+  const [chatHistory, setChatHistory] = useState([]); // 전체 채팅 내역
+  const [isLoading, setIsLoading] = useState(false);
 
+  // 페이지 로드 시 채팅 내역 불러오기
+  useEffect(() => {
+    loadChatHistory();
+  }, []);
+
+  // 채팅 내역 불러오기
+  const loadChatHistory = async () => {
+    try {
+      const drawingId = 1; // 실제로는 props나 context에서 받아와야 함
+      const history = await getChatHistory(drawingId);
+      setChatHistory(history);
+    } catch (error) {
+      console.error("채팅 내역 로드 실패:", error);
+    }
+  };
+
+  // 질문 전송
   const handleSendQuestion = async () => {
     if (!chatInput.trim()) return;
 
+    const userMessage = chatInput.trim();
+    
+    // 사용자 메시지를 즉시 화면에 표시
+    setChatHistory(prev => [...prev, { role: "user", content: userMessage }]);
+    setChatInput("");
+    setIsLoading(true);
+
     try {
-      setAiResponse("AI가 답변을 생각하고 있습니다...");
+      const drawingId = 1; // 실제로는 props나 context에서 받아와야 함
+      const templateName = "드론"; // 실제로는 선택된 부품명
       
-      // 백엔드에서 순수 텍스트로 답장이 옴 (data 자체가 문자열)
-      const textResponse = await askAi(chatInput); 
+      // AI 답변 받기
+      const aiResponse = await askAi(drawingId, templateName, userMessage);
       
-      setAiResponse(textResponse);
-      setChatInput(""); // 전송 후 입력창 비우기
+      // AI 답변을 채팅 내역에 추가
+      setChatHistory(prev => [...prev, { role: "ai", content: aiResponse }]);
+      
     } catch (error) {
       console.error("AI 연동 에러:", error);
-      setAiResponse("답변을 가져오는 중 오류가 발생했습니다.");
+      setChatHistory(prev => [...prev, { 
+        role: "ai", 
+        content: "죄송합니다. 답변을 가져오는 중 오류가 발생했습니다." 
+      }]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -134,9 +167,30 @@ const Studypage = () => {
                     <img src={star} alt="star" />
                     AI 가이드
                   </S.Ai_title>
-                  {/* 백엔드에서 받은 텍스트 출력 */}
-                  <S.Ai_text>{aiResponse}</S.Ai_text>
+                  
+                  <S.Ai_text>
+                    {chatHistory.length === 0 ? (
+                      <div style={{ opacity: 0.6 }}>
+                        무엇을 도와드릴까요? 제트 엔진에 대해 궁금한 점을 물어보세요.
+                      </div>
+                    ) : (
+                      chatHistory.map((msg, index) => (
+                        <S.ChatMessage key={index} $isUser={msg.role === "user"}>
+                          <S.ChatRole>{msg.role === "user" ? "You" : "AI"}</S.ChatRole>
+                          <S.ChatContent>{msg.content}</S.ChatContent>
+                        </S.ChatMessage>
+                      ))
+                    )}
+                    
+                    {isLoading && (
+                      <S.ChatMessage $isUser={false}>
+                        <S.ChatRole>AI</S.ChatRole>
+                        <S.ChatContent>답변을 생성하고 있습니다...</S.ChatContent>
+                      </S.ChatMessage>
+                    )}
+                  </S.Ai_text>
                 </S.St_Aichat>
+                
                 <S.St_user>
                   <img src={plus} alt="plus" />
                   <S.User_chat
@@ -144,13 +198,14 @@ const Studypage = () => {
                     placeholder="무엇을 도와드릴까요?"
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSendQuestion()}
+                    onKeyDown={(e) => e.key === "Enter" && !isLoading && handleSendQuestion()}
+                    disabled={isLoading}
                   />
                   <img 
                     src={glass} 
                     alt="search" 
-                    onClick={handleSendQuestion} 
-                    style={{ cursor: "pointer" }}
+                    onClick={isLoading ? null : handleSendQuestion} 
+                    style={{ cursor: isLoading ? "not-allowed" : "pointer", opacity: isLoading ? 0.5 : 1 }}
                   />
                 </S.St_user>
               </S.St_Ai>

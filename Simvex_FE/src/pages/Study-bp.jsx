@@ -121,9 +121,9 @@ const mockParts = [
     partId: 8,
     partName: "Part5-Spannbacke", // 죠 플레이트 2 (이동 죠 안쪽)
     fileName: "Part5-Spannbacke.glb",
-    x_coordinate: 0.5,
-    y_coordinate: 4.5,
-    z_coordinate: 7,
+    x_coordinate: 0.848,
+    y_coordinate: 1.88,
+    z_coordinate: 8.45,
     x_rotation: 0,
     y_rotation: 1.57, // 반대 방향 회전 유지
     z_rotation: 0,
@@ -132,9 +132,9 @@ const mockParts = [
     partId: 2,
     partName: "Part7-TrapezSpindel", // 메인 스핀들 (수평 관통)
     fileName: "Part7-TrapezSpindel.glb",
-    x_coordinate: -12.0, 
-    y_coordinate: 4.5,
-    z_coordinate: 7,
+    x_coordinate: -1.7, 
+    y_coordinate: 2.07,
+    z_coordinate: 7.7,
     x_rotation: 3.14,
     y_rotation: -1.57,
     z_rotation: 0,
@@ -149,8 +149,9 @@ const Studypage = () => {
   const navigate = useNavigate();
   const [parts, setParts] = useState(mockParts);
   const [chatInput, setChatInput] = useState("");
-  const [aiResponse, setAiResponse] = useState("무엇을 도와드릴까요?");
+  const [aiResponse, setAiResponse] = useState("데이터를 불러오는 중...");
   const [notes, setNotes] = useState([]);
+  
 
   const {
     zoom,
@@ -169,6 +170,22 @@ const Studypage = () => {
     selectedNote,
     setSelectedNote,
   } = useStudyLogic();
+
+  useEffect(() => {
+    const fetchInitialAiMessage = async () => {
+      try {
+        // studyApi.js에 getAiAssistant(id) 가 정의되어 있다고 가정
+        const response = await fetch("http://15.165.72.154:8000/api/v1/assistant/1");
+        const data = await response.json();
+        // 응답 구조에 따라 data.content 등으로 수정 필요할 수 있음
+        setAiResponse(data.content || "안녕하세요! 무엇을 도와드릴까요?");
+      } catch (error) {
+        console.error("AI 가이드를 불러오지 못했습니다.", error);
+        setAiResponse("AI 가이드를 불러오는 데 실패했습니다.");
+      }
+    };
+    fetchInitialAiMessage();
+  }, []);
 
   // 마운트 시 분해도 0 초기화
   useEffect(() => {
@@ -194,12 +211,35 @@ const Studypage = () => {
     fetchParts();
   }, []);
 
+// 2. [수정] AI 질문 전송 로직 (POST)
   const handleSendQuestion = async () => {
     if (!chatInput.trim()) return;
-    setAiResponse("분석 중...");
-    const result = await askAi(chatInput);
-    setAiResponse(result);
+    
+    const prevChat = chatInput;
     setChatInput("");
+    setAiResponse("분석 중...");
+
+    try {
+      const response = await fetch("http://15.165.72.154:8000/api/v1/assistant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: 1,
+          drawing_id: 1,
+          template_name: "기계 바이스",
+          content: prevChat
+        }),
+      });
+
+      const result = await response.json();
+      // 명세서상 응답이 바로 string이거나 { content: "..." } 형태일 수 있음
+      setAiResponse(typeof result === "string" ? result : result.content);
+    } catch (error) {
+      console.error("AI 응답 에러:", error);
+      setAiResponse("답변을 가져오는 중 오류가 발생했습니다.");
+    }
   };
 
   const handleAddNewNote = () => {
@@ -229,7 +269,7 @@ const Studypage = () => {
     <S.Study_Body>
       <S.CanvasContainer>
         {/* [수정] 카메라의 위치(position)를 x=12로, 타겟(OrbitControls target)을 x=5로 조정하여 시야를 오른쪽으로 이동 */}
-        <Canvas dpr={[1, 2]} camera={{ position: [12, 11, 11], fov: 45 }}>
+        <Canvas dpr={[1, 2]} camera={{ position: [1, 2, 5 ], fov: 45 }}>
           <ambientLight intensity={1.5} />
           <pointLight position={[10, 10, 10]} intensity={2} />
 
@@ -263,7 +303,7 @@ const Studypage = () => {
             />
           </Suspense>
           {/* [핵심] 시야를 오른쪽으로 옮기기 위해 target의 x좌표를 5로 설정 */}
-          <OrbitControls makeDefault target={[7, 0, 0]} />
+          <OrbitControls makeDefault target={[0, 0, 0]} />
         </Canvas>
       </S.CanvasContainer>
 
@@ -344,16 +384,16 @@ const Studypage = () => {
             {activeTab === "부품 정보" && (
               <>
                 <S.St_component_box>
-                  <S.Com_title>기계 바이스(Machine Vice) 조립도</S.Com_title>
+                  <S.Com_title>Machine Vice 조립도</S.Com_title>
                   <S.Com_imagebox>
                     {parts.map((p, idx) => (
                       <S.Com_image key={`img-${idx}`} />
                     ))}
                   </S.Com_imagebox>
                   <S.Com_explainbox>
-                    <S.Com_extitle>작동 설명</S.Com_extitle>
+                    <S.Com_extitle>부품 이름</S.Com_extitle>
                     <S.Com_explain>
-                      분해도를 조절하여 기계 바이스의 내부 클램핑 메커니즘을 확인하세요.
+                      설명
                     </S.Com_explain>
                   </S.Com_explainbox>
                 </S.St_component_box>
