@@ -18,7 +18,7 @@ import arrow from "../assets/arrow.svg";
 import X from "../assets/X.svg";
 import plus from "../assets/Plus.png";
 import minus from "../assets/Minus.svg";
-import star from "../assets/Star.svg";
+import star from "../assets/star.svg";
 import glass from "../assets/glass.svg";
 import oplus from "../assets/oplus.svg";
 
