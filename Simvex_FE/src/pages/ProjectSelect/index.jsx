@@ -14,7 +14,7 @@ const USE_API = import.meta.env.VITE_USE_API === 'true';
 const saveProjectsToLocal = (projects) => {
   localStorage.setItem(PROJECTS_KEY, JSON.stringify(projects));
 };
-
+//시발
 const loadProjectsFromLocal = () => {
   const saved = localStorage.getItem(PROJECTS_KEY);
   return saved ? JSON.parse(saved) : [];
