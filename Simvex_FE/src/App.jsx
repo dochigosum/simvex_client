@@ -21,18 +21,11 @@ function App() {
       
       {/* Study: 오브젝트 선택 */}
       <Route path="/study/select" element={<ObjectSelect />} />
-<<<<<<< HEAD
 
-      <Route path="/study/bp" element={< StudyBP/>} />
-      <Route path="/study" element={< Studypage/>} /> 
-=======
-      
-      {/* Study: 선택한 오브젝트 학습 */}
-      <Route path="/study" element={<Studypage />} />
-      <Route path="/studybp" element={<StudyBP />} /> 
+      <Route path="/study/" element={<Studypage />} />
+      <Route path="/study/bp" element={<StudyBP />} /> 
       
       {/* CAD */}
->>>>>>> origin/develop
       <Route path="/cad/select" element={<ProjectSelect />} />
       <Route path="/cad" element={<CAD />} />
     </Routes>

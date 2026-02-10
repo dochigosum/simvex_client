@@ -103,12 +103,8 @@ const ObjectSelect = () => {
   };
 
   const handleObjectClick = (object) => {
-<<<<<<< HEAD
     navigate('/study/BP', { state: { selectedObject: object } });
-=======
-    // 친구가 만든 Study 페이지로 이동
-    navigate('/study', { state: { selectedObject: object } });
->>>>>>> origin/develop
+
   };
 
   const handleAddObject = () => {

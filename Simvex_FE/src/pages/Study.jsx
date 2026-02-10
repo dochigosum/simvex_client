@@ -2,12 +2,10 @@ import { Suspense, useState, useEffect } from "react";
 import { useStudyLogic } from "../js/useStudy.js";
 import * as S from "../js/Study.styles.js";
 import { Canvas } from "@react-three/fiber";
-<<<<<<< HEAD
-import { useNavigate } from "react-router-dom";
-=======
+
 import { useNavigate, useLocation } from "react-router-dom";
-import { askAi, getChatHistory } from "../apis/studyApi.js"; 
->>>>>>> origin/develop
+import {} from "../apis/studyApi.js"; 
+
 
 import {
   useGLTF,
