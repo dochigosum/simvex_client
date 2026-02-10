@@ -5,9 +5,9 @@
 }
 
 .object-select-container {
-  max-width: 896px; /* 1120 * 0.8 */
+  max-width: 1088px; /* 1360 * 0.8 */
   margin: 0 auto;
-  padding: 51px 26px; /* 64 * 0.8, 32 * 0.8 */
+  padding: 64px 38px; /* 80 * 0.8, 48 * 0.8 */
 }
 
 .object-select-title {
@@ -20,8 +20,8 @@
 
 .object-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(179px, 1fr)); /* 224 * 0.8 */
-  gap: 15px; /* 19 * 0.8 */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 19px; /* 24 * 0.8 */
 }
 
 .object-card-wrapper {
@@ -30,19 +30,20 @@
 }
 
 .object-card {
-  background: #2d3748;
-  border-radius: 10px; /* 13 * 0.8 */
+  background: #2a2e35;
+  border-radius: 10px; /* 12 * 0.8 */
   overflow: hidden;
-  aspect-ratio: 1;
+  aspect-ratio: 4/3;
   transition: all 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 10px; /* 12 * 0.8 */
 }
 
 .object-card-wrapper:hover .object-card {
-  transform: translateY(-5px); /* 6 * 0.8 */
-  box-shadow: 0 10px 26px rgba(107, 127, 255, 0.3); /* 12 * 0.8, 32 * 0.8 */
+  transform: translateY(-3px); /* 4 * 0.8 */
+  box-shadow: 0 6px 19px rgba(107, 127, 255, 0.4); /* 8 * 0.8, 24 * 0.8 */
 }
 
 .object-thumbnail {
@@ -56,26 +57,33 @@
   font-size: 13px; /* 16 * 0.8 */
   font-weight: 600;
   text-align: center;
-  margin: 8px 0 0 0; /* 10 * 0.8 */
+  margin: 0;
   line-height: 1.4;
 }
 
 /* 오브젝트 추가 카드 */
-.add-object-card {
+.add-object-wrapper .object-card {
   background: #1f2937;
   border: 2px dashed #4b5563;
+  flex-direction: column;
+  gap: 10px; /* 12 * 0.8 */
 }
 
-.object-card-wrapper:hover .add-object-card {
+.add-object-wrapper:hover .object-card {
   background: #374151;
   border-color: #6B7FFF;
 }
 
 .add-object-icon {
-  font-size: 64px; /* 80 * 0.8 */
+  font-size: 51px; /* 64 * 0.8 */
   color: #6B7FFF;
   font-weight: 300;
   user-select: none;
+}
+
+.add-object-wrapper .object-name {
+  color: #9ca3af;
+  font-size: 11px; /* 14 * 0.8 */
 }
 
 @media (max-width: 768px) {
@@ -84,7 +92,7 @@
   }
 
   .object-grid {
-    grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); /* 160 * 0.8 */
-    gap: 10px; /* 13 * 0.8 */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 13px; /* 16 * 0.8 */
   }
 }

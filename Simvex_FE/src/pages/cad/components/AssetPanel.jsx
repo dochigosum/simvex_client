@@ -12,6 +12,9 @@ const ASSET_FOLDERS = [
 ];
 
 function AssetPanel({ selectedAssets, onAssetClick }) {
+  console.log('🎨 AssetPanel 렌더링, selectedAssets:', selectedAssets);
+  console.log('🎨 AssetPanel onAssetClick:', !!onAssetClick);
+  
   const [folders] = useState(ASSET_FOLDERS); // 초기값으로 설정
   const [currentFolder, setCurrentFolder] = useState(null);
   const [files, setFiles] = useState([]);
@@ -134,7 +137,10 @@ function AssetPanel({ selectedAssets, onAssetClick }) {
               <div 
                 key={index}
                 className={`asset-item ${isSelected ? 'selected' : ''}`}
-                onClick={() => onAssetClick(file)}
+                onClick={() => {
+                  console.log('🖱️ AssetPanel 클릭!', file);
+                  onAssetClick(file);
+                }}
               >
                 <div className="asset-preview">
                   {file.type === 'glb' ? (
