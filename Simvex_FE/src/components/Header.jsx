@@ -21,7 +21,7 @@ const Header = () => {
 
           {/* 현재 경로가 "/study" 인지 확인 */}
           <Menu_choice
-            $isActive={location.pathname === "/study"}
+            $isActive={location.pathname === "/study" || "/studybp"}
             onClick={() => navigate("/study")}
           >
             Study
@@ -30,7 +30,7 @@ const Header = () => {
           <Menu_choice>CAD</Menu_choice>
         </Header_menu>
         <Header_sign>
-          <img src={Logout} alt="Logout" /> Sign&nbsp;in
+          <img src={Logout} /> Sign&nbsp;in
         </Header_sign>
       </Header_text>
     </HeaderBody>
@@ -69,25 +69,25 @@ const Header_menu = styled.div`
 `;
 
 const Menu_choice = styled.button`
-    width: 76px;
-    font-weight: 400;
-    font-size: 19.2px;
-    color: #fff;
-    background-color: #121417;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 9.6px;
-    gap: 5px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  width: 76px;
+  font-weight: 400;
+  font-size: 19.2px;
+  color: #fff;
+  background-color: #121417;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9.6px;
+  gap: 5px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
   background-color: ${(props) => (props.$isActive ? "#4649F1" : "#121417")};
   color: ${(props) => (props.$isActive ? "#fff" : "#fff")};
   &:hover {
-    background-color: ${(props) => (props.$isActive ? "#4649F1" : "#2a2d33")
-    }}
-`
+    background-color: ${(props) => (props.$isActive ? "#4649F1" : "#2a2d33")};
+  }
+`;
 
 const Header_sign = styled.div`
   width: 105.6px;
