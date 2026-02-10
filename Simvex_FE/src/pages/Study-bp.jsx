@@ -10,7 +10,7 @@ import {
   ContactShadows,
   Center,
 } from "@react-three/drei";
-import { getPartsList, askAi } from "../apis/studyApi";
+import { getAssemblyParts, getAiConversation, sendAiQuestion, createNote } from "../apis/studyApi";
 
 import Header from "../components/Header";
 import arrow from "../assets/arrow.svg";
@@ -48,7 +48,8 @@ const PartModel = ({ url, position, rotation, scale = 1, explosionFactor }) => {
 };
 
 /**
- * [Machine Vice 조립 좌표]
+ * [Machine Vice 조립 좌표 - Fallback용]
+ * 서버에서 데이터 못 가져올 때 사용
  */
 const mockParts = [
   {
@@ -171,17 +172,23 @@ const Studypage = () => {
     setSelectedNote,
   } = useStudyLogic();
 
+  // ====================================
+  // 🤖 AI 초기 메시지 가져오기
+  // ====================================
   useEffect(() => {
     const fetchInitialAiMessage = async () => {
       try {
-        // studyApi.js에 getAiAssistant(id) 가 정의되어 있다고 가정
-        const response = await fetch("http://15.165.72.154:8000/api/v1/assistant/1");
-        const data = await response.json();
-        // 응답 구조에 따라 data.content 등으로 수정 필요할 수 있음
-        setAiResponse(data.content || "안녕하세요! 무엇을 도와드릴까요?");
+        const data = await getAiConversation(1);
+        if (data && data.length > 0) {
+          // AI의 마지막 응답 찾기
+          const lastAiMessage = data.filter(msg => msg.role === "ai").pop();
+          setAiResponse(lastAiMessage?.content || "안녕하세요! 무엇을 도와드릴까요?");
+        } else {
+          setAiResponse("안녕하세요! 무엇을 도와드릴까요?");
+        }
       } catch (error) {
         console.error("AI 가이드를 불러오지 못했습니다.", error);
-        setAiResponse("AI 가이드를 불러오는 데 실패했습니다.");
+        setAiResponse("안녕하세요! 무엇을 도와드릴까요?");
       }
     };
     fetchInitialAiMessage();
@@ -194,24 +201,48 @@ const Studypage = () => {
     }
   }, [setProgress]);
 
+  // ====================================
+  // 🔧 조립도 부품 데이터 가져오기
+  // ====================================
   useEffect(() => {
     const fetchParts = async () => {
-      const data = await getPartsList();
-      if (data && data.length > 0) {
-        setParts(
-          data.map((d) => {
-            const matched = mockParts.find(
-              (m) => m.fileName === (d.fileName || d.file_name)
-            );
-            return matched ? { ...d, ...matched } : d;
-          })
-        );
+      try {
+        const data = await getAssemblyParts();
+        if (data && data.length > 0) {
+          // 서버 데이터를 mockParts 형식으로 매핑
+          const mappedParts = data.map((serverPart) => {
+            // fileName이나 partModelUrl에서 파일명 추출
+            const fileName = serverPart.fileName || 
+                           serverPart.partModelUrl?.split('/').pop() || 
+                           `${serverPart.partName}.glb`;
+            
+            return {
+              partId: serverPart.partId,
+              partName: serverPart.partName,
+              fileName: fileName,
+              x_coordinate: serverPart.x_coordinate || 0,
+              y_coordinate: serverPart.y_coordinate || 0,
+              z_coordinate: serverPart.z_coordinate || 0,
+              x_rotation: serverPart.x_rotation || 0,
+              y_rotation: serverPart.y_rotation || 0,
+              z_rotation: serverPart.z_rotation || 0,
+            };
+          });
+          setParts(mappedParts);
+          console.log("✅ 서버에서 부품 데이터 로드 완료:", mappedParts);
+        } else {
+          console.log("⚠️ 서버 데이터 없음, Mock 데이터 사용");
+        }
+      } catch (error) {
+        console.error("❌ 부품 데이터 로드 실패, Mock 데이터 사용:", error);
       }
     };
     fetchParts();
   }, []);
 
-// 2. [수정] AI 질문 전송 로직 (POST)
+  // ====================================
+  // 💬 AI 질문 전송
+  // ====================================
   const handleSendQuestion = async () => {
     if (!chatInput.trim()) return;
     
@@ -220,47 +251,68 @@ const Studypage = () => {
     setAiResponse("분석 중...");
 
     try {
-      const response = await fetch("http://15.165.72.154:8000/api/v1/assistant", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: 1,
-          drawing_id: 1,
-          template_name: "기계 바이스",
-          content: prevChat
-        }),
-      });
-
-      const result = await response.json();
-      // 명세서상 응답이 바로 string이거나 { content: "..." } 형태일 수 있음
-      setAiResponse(typeof result === "string" ? result : result.content);
+      const aiAnswer = await sendAiQuestion(1, 1, "기계 바이스", prevChat);
+      setAiResponse(aiAnswer);
     } catch (error) {
       console.error("AI 응답 에러:", error);
       setAiResponse("답변을 가져오는 중 오류가 발생했습니다.");
     }
   };
 
-  const handleAddNewNote = () => {
+  // ====================================
+  // 📝 Note 추가 (서버에 저장)
+  // ====================================
+  const handleAddNewNote = async () => {
     if (notes.length >= 12) {
       alert("메모는 최대 12개까지만 작성할 수 있습니다.");
       return;
     }
+    
     const newNote = {
       id: Date.now(),
       title: `메모 ${notes.length + 1}`,
       text: "내용을 입력하세요.",
     };
+    
+    // 로컬 상태에 먼저 추가
     setNotes([...notes, newNote]);
     setSelectedNote(newNote);
     setIsModalOpen(true);
+    
+    // 서버에 저장 (비동기)
+    try {
+      const detail = JSON.stringify({
+        title: newNote.title,
+        text: newNote.text
+      });
+      
+      const result = await createNote(1, detail); // drawingId = 1
+      console.log("✅ 메모 서버 저장 성공:", result);
+    } catch (error) {
+      console.error("❌ 메모 서버 저장 실패:", error);
+    }
   };
 
-  const handleUpdateNote = (field, value) => {
+  // ====================================
+  // 📝 Note 수정 (서버에도 업데이트)
+  // ====================================
+  const handleUpdateNote = async (field, value) => {
     const updated = { ...selectedNote, [field]: value };
     setSelectedNote(updated);
     setNotes(notes.map((n) => (n.id === selectedNote.id ? updated : n)));
+    
+    // 서버에 저장 (디바운싱 없이 즉시 저장 - 실제론 디바운싱 권장)
+    try {
+      const detail = JSON.stringify({
+        title: updated.title,
+        text: updated.text
+      });
+      
+      await createNote(1, detail); // drawingId = 1
+      console.log("✅ 메모 업데이트 완료");
+    } catch (error) {
+      console.error("❌ 메모 업데이트 실패:", error);
+    }
   };
 
   const explosionFactor = progress / 100;
@@ -268,8 +320,7 @@ const Studypage = () => {
   return (
     <S.Study_Body>
       <S.CanvasContainer>
-        {/* [수정] 카메라의 위치(position)를 x=12로, 타겟(OrbitControls target)을 x=5로 조정하여 시야를 오른쪽으로 이동 */}
-        <Canvas dpr={[1, 2]} camera={{ position: [1, 2, 5 ], fov: 45 }}>
+        <Canvas dpr={[1, 2]} camera={{ position: [1, 2, 5], fov: 45 }}>
           <ambientLight intensity={1.5} />
           <pointLight position={[10, 10, 10]} intensity={2} />
 
@@ -302,7 +353,6 @@ const Studypage = () => {
               blur={2.5}
             />
           </Suspense>
-          {/* [핵심] 시야를 오른쪽으로 옮기기 위해 target의 x좌표를 5로 설정 */}
           <OrbitControls makeDefault target={[0, 0, 0]} />
         </Canvas>
       </S.CanvasContainer>
@@ -387,7 +437,31 @@ const Studypage = () => {
                   <S.Com_title>Machine Vice 조립도</S.Com_title>
                   <S.Com_imagebox>
                     {parts.map((p, idx) => (
-                      <S.Com_image key={`img-${idx}`} />
+                      <S.Com_image key={`img-${idx}`} style={{ position: 'relative', overflow: 'hidden' }}>
+                        {/* 3D 미리보기만 */}
+                        <Canvas
+                          dpr={[1, 2]}
+                          camera={{ position: [2, 2, 2], fov: 50 }}
+                          style={{ width: '100%', height: '100%' }}
+                        >
+                          <ambientLight intensity={1} />
+                          <pointLight position={[5, 5, 5]} intensity={1} />
+                          <Suspense fallback={null}>
+                            <PartModel
+                              url={`/3Dasset/Machine Vice/${p.fileName}`}
+                              position={[0, 0, 0]}
+                              rotation={[p.x_rotation || 0, p.y_rotation || 0, p.z_rotation || 0]}
+                              scale={1}
+                              explosionFactor={0}
+                            />
+                          </Suspense>
+                          <OrbitControls 
+                            enableZoom={false}
+                            enablePan={false}
+                            enableRotate={false}
+                          />
+                        </Canvas>
+                      </S.Com_image>
                     ))}
                   </S.Com_imagebox>
                   <S.Com_explainbox>
@@ -427,8 +501,18 @@ const Studypage = () => {
                     placeholder="무엇을 도와드릴까요?"
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSendQuestion();
+                      }
+                    }}
                   />
-                  <img src={glass} alt="search" onClick={handleSendQuestion} />
+                  <img 
+                    src={glass} 
+                    alt="search" 
+                    onClick={handleSendQuestion}
+                    style={{ cursor: 'pointer' }}
+                  />
                 </S.St_user>
               </S.St_Ai>
             )}

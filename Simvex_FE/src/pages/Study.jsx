@@ -3,7 +3,6 @@ import { useStudyLogic } from "../js/useStudy.js";
 import * as S from "../js/Study.styles.js";
 import { Canvas } from "@react-three/fiber";
 import { useNavigate } from "react-router-dom";
-import { askAi, getChatHistory } from "../apis/studyApi.js"; 
 
 import {
   useGLTF,
@@ -30,11 +29,21 @@ const Model = ({ url, zoom }) => {
 const Studypage = () => {
   const modelUrl = "/3Dasset/Drone/Armgear.glb";
   const {
-    zoom, handleZoomIn, handleZoomOut,
-    isOpen, toggleMenu,
-    activeTab, setActiveTab,
-    isModalOpen, setIsModalOpen,
-    selectedNote, setSelectedNote
+    zoom,
+    handleZoomIn,
+    handleZoomOut,
+    isOpen,
+    toggleMenu,
+    progress,
+    setProgress,
+    barRef,
+    handleMouseDown,
+    activeTab,
+    setActiveTab,
+    isModalOpen,
+    setIsModalOpen,
+    selectedNote,
+    setSelectedNote,
   } = useStudyLogic();
 
   const navigate = useNavigate();
@@ -43,6 +52,9 @@ const Studypage = () => {
   const [chatInput, setChatInput] = useState("");
   const [chatHistory, setChatHistory] = useState([]); // 전체 채팅 내역
   const [isLoading, setIsLoading] = useState(false);
+
+  
+    const [notes, setNotes] = useState([]);
 
   // 페이지 로드 시 채팅 내역 불러오기
   useEffect(() => {
@@ -92,6 +104,29 @@ const Studypage = () => {
     }
   };
 
+  const handleAddNewNote = () => {
+    if (notes.length >= 12) {
+      alert("메모는 최대 12개까지만 작성할 수 있습니다.");
+      return;
+    }
+    const newNote = {
+      id: Date.now(),
+      title: `메모 ${notes.length + 1}`,
+      text: "내용을 입력하세요.",
+    };
+    setNotes([...notes, newNote]);
+    setSelectedNote(newNote);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateNote = (field, value) => {
+    const updated = { ...selectedNote, [field]: value };
+    setSelectedNote(updated);
+    setNotes(notes.map((n) => (n.id === selectedNote.id ? updated : n)));
+  };
+
+  const explosionFactor = progress / 100;
+
   return (
     <S.Study_Body>
       <S.CanvasContainer>
@@ -119,8 +154,8 @@ const Studypage = () => {
 
       <S.St_Main>
         <S.St_Menu>
-          <S.StMenu_choice onClick={() => navigate("/study")}>단일 부품</S.StMenu_choice>
-          <S.StMenu_choice onClick={() => navigate("/studybp")}>조립도</S.StMenu_choice>
+          <S.StMenu_choice onClick={() => navigate("/study/")}>단일 부품</S.StMenu_choice>
+          <S.StMenu_choice onClick={() => navigate("/study/BP")}>조립도</S.StMenu_choice>
         </S.St_Menu>
 
         <S.St_page $isOpen={isOpen}>
@@ -155,7 +190,7 @@ const Studypage = () => {
                 <S.Com_title>제트엔진</S.Com_title>
                 <S.Com_imagebox>이미지</S.Com_imagebox>
                 <S.Com_explainbox>
-                  <S.Com_explain>아아</S.Com_explain>
+                  <S.Com_explain>아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아</S.Com_explain>
                 </S.Com_explainbox>
               </S.St_component_box>
             )}
@@ -212,24 +247,37 @@ const Studypage = () => {
             )}
 
             {activeTab === "Note" && (
-              <S.St_notebox>
-                <S.St_note
-                  onClick={() => {
-                    setSelectedNote({
-                      title: "제목",
-                      text: "메모를 작성해보세요!",
-                    }); 
-                    setIsModalOpen(true);
-                  }}
-                >
-                  <S.Note_title>제목</S.Note_title>
-                  <S.Note_line></S.Note_line>
-                  <S.Note_text>메모를 작성해보세요!</S.Note_text>
-                </S.St_note>
-
-                <S.St_notemaker>
-                  <img width={44} height={44} src={oplus} alt="add" />
-                </S.St_notemaker>
+              <S.St_notebox
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, 200px)",
+                  gap: "32px",
+                  overflowY: "auto",
+                  height: "calc(100% - 120px)",
+                  padding: "20px",
+                  justifyContent: "center",
+                  alignContent: "start",
+                }}
+              >
+                {notes.map((note) => (
+                  <S.St_note
+                    key={note.id}
+                    onClick={() => {
+                      setSelectedNote(note);
+                      setIsModalOpen(true);
+                    }}
+                    style={{ width: "200px", height: "200px", flexShrink: 0 }}
+                  >
+                    <S.Note_title>{note.title}</S.Note_title>
+                    <S.Note_line />
+                    <S.Note_text>{note.text}</S.Note_text>
+                  </S.St_note>
+                ))}
+                {notes.length < 12 && (
+                  <S.St_notemaker onClick={handleAddNewNote}>
+                    <img width={44} height={44} src={oplus} alt="add" />
+                  </S.St_notemaker>
+                )}
               </S.St_notebox>
             )}
           </S.St_3dSetting>
@@ -245,15 +293,46 @@ const Studypage = () => {
         </S.PM_btnbox>
       </S.St_Main>
 
-      {isModalOpen && (
+     {isModalOpen && (
         <S.Note_modalbody onClick={() => setIsModalOpen(false)}>
           <S.Modal_main onClick={(e) => e.stopPropagation()}>
             <S.Modal_title>
-              {selectedNote?.title} 
-              <img src={X} alt="close" onClick={() => setIsModalOpen(false)}/>
+              <input
+                value={selectedNote?.title || ""}
+                onChange={(e) => handleUpdateNote("title", e.target.value)}
+                style={{
+                  border: "none",
+                  outline: "none",
+                  background: "transparent",
+                  width: "85%",
+                  fontSize: "inherit",
+                  fontWeight: "inherit",
+                  color: "inherit",
+                }}
+              />
+              <img
+                src={X}
+                alt="close"
+                onClick={() => setIsModalOpen(false)}
+                style={{ cursor: "pointer" }}
+              />
             </S.Modal_title>
-            <S.Modal_line></S.Modal_line>
-            <S.Modal_text>{selectedNote?.text}</S.Modal_text>
+            <S.Modal_line />
+            <textarea
+              value={selectedNote?.text || ""}
+              onChange={(e) => handleUpdateNote("text", e.target.value)}
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                width: "100%",
+                height: "250px",
+                resize: "none",
+                fontSize: "16px",
+                color: "inherit",
+                marginTop: "10px",
+              }}
+            />
           </S.Modal_main>
         </S.Note_modalbody>
       )}

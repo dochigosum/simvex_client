@@ -103,7 +103,7 @@ const ObjectSelect = () => {
   };
 
   const handleObjectClick = (object) => {
-    navigate('/study', { state: { selectedObject: object } });
+    navigate('/study/BP', { state: { selectedObject: object } });
   };
 
   const handleAddObject = () => {

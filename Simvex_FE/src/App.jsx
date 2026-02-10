@@ -24,8 +24,8 @@ function App() {
       
       <Route path="/study/select" element={<ObjectSelect />} />
 
-      <Route path="/study" element={< Studypage/>} />
-      <Route path="/studybp" element={< StudyBP/>} /> 
+      <Route path="/study/bp" element={< StudyBP/>} />
+      <Route path="/study" element={< Studypage/>} /> 
       <Route path="/cad/select" element={<ProjectSelect />} />
       <Route path="/cad" element={<CAD />} />
 
