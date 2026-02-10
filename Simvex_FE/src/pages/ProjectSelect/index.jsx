@@ -118,7 +118,7 @@ const ProjectSelect = () => {
       // API 모드: 서버에 프로젝트 생성
       const newProject = await createProject({
         name: projectName,
-        previewImgUrl: null
+        previewImgUrl: "" // null 대신 빈 문자열 전송
       });
       
       console.log('✅ API: 프로젝트 생성 성공:', newProject);
