@@ -1,6 +1,6 @@
 import { Suspense, useState, useEffect } from "react";
 import { useStudyLogic } from "../js/useStudy.js";
-import * as S from "../js/Study_styles.js";
+import * as S from "../js/Study.styles.js";
 import { Canvas } from "@react-three/fiber";
 
 import { useNavigate, useLocation } from "react-router-dom";

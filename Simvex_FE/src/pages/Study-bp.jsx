@@ -10,7 +10,7 @@ import {
   ContactShadows,
   Center,
 } from "@react-three/drei";
-import { getAssemblyParts, getAiConversation, sendAiQuestion, createNote } from "../apis/studyApi";
+// import { getAssemblyParts, getAiConversation, sendAiQuestion, createNote } from "../apis/studyApi";
 
 import Header from "../components/Header";
 import arrow from "../assets/arrow.svg";
