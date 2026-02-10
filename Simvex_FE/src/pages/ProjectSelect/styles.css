@@ -77,18 +77,21 @@
 .project-card-info {
   padding: 13px; /* 16 * 0.8 */
   background: #1f2228;
+  min-height: 52px; /* 13 + 13 + 13 + 13 (padding top/bottom + 텍스트 두 줄 대략) */
 }
 
 .project-card-name {
   color: white;
   font-size: 13px; /* 16 * 0.8 */
   font-weight: 600;
+  line-height: 1.4;
   margin: 0 0 6px 0; /* 8 * 0.8 */
 }
 
 .project-card-date {
   color: #9ca3af;
   font-size: 10px; /* 13 * 0.8 */
+  line-height: 1.4;
   margin: 0;
 }
 
