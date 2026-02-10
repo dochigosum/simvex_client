@@ -12,7 +12,7 @@ import {
 } from "@react-three/drei";
 import { getPartsList, askAi } from "../apis/studyApi";
 
-import Header from "../components/Header";
+import Header from "../components/Layout/Navigation";
 import arrow from "../assets/arrow.svg";
 import X from "../assets/X.svg";
 import tr from "../assets/tr.svg";

@@ -2,7 +2,7 @@ import { Suspense, useState, useEffect } from "react";
 import { useStudyLogic } from "../js/useStudy.js";
 import * as S from "../js/Study.styles.js";
 import { Canvas } from "@react-three/fiber";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { askAi, getChatHistory } from "../apis/studyApi.js"; 
 
 import {
@@ -13,7 +13,7 @@ import {
   Center,
 } from "@react-three/drei";
 
-import Header from "../components/Header";
+import Header from "../components/Layout/Navigation";
 import arrow from "../assets/arrow.svg";
 import X from "../assets/X.svg";
 import plus from "../assets/Plus.png";
@@ -28,7 +28,15 @@ const Model = ({ url, zoom }) => {
 };
 
 const Studypage = () => {
-  const modelUrl = "/3Dasset/Drone/Armgear.glb";
+  const location = useLocation();
+  const navigate = useNavigate();
+  const selectedObject = location.state?.selectedObject;
+  
+  // 선택된 오브젝트에 따라 모델 URL 설정 (임시로 기본값 사용)
+  const modelUrl = selectedObject?.category 
+    ? `/3D Asset/${selectedObject.category}/Armgear.glb`
+    : "/3D Asset/Drone/Armgear.glb";
+  
   const {
     zoom, handleZoomIn, handleZoomOut,
     isOpen, toggleMenu,
@@ -36,8 +44,6 @@ const Studypage = () => {
     isModalOpen, setIsModalOpen,
     selectedNote, setSelectedNote
   } = useStudyLogic();
-
-  const navigate = useNavigate();
 
   // AI 채팅 관련 상태
   const [chatInput, setChatInput] = useState("");

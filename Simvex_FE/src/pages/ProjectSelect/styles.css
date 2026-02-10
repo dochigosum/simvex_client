@@ -1,7 +1,7 @@
 .project-select-page {
   min-height: 100vh;
   background: #1B1C20;
-  padding-top: 51px; /* 64 * 0.8 */
+  padding-top: 68px; /* Navigation 높이 (85 * 0.8) */
 }
 
 .project-select-container {
